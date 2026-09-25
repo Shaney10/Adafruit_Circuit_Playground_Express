@@ -6,7 +6,8 @@ NeoPixelScroller::NeoPixelScroller(uint16_t numPixels, uint8_t pin)
       currentPixel(0),
       colorHue(0),
       lastUpdate(0),
-      stepDelay(80) {}
+      stepDelay(80),
+      direction(CLOCKWISE) {}
 
 void NeoPixelScroller::begin() {
     strip.begin();
@@ -18,8 +19,10 @@ void NeoPixelScroller::setSpeed(uint16_t delayMs) {
     stepDelay = delayMs;
 }
 
-// Input a value 0 to 255 to get a color value.
-// The colours are a transition R -> G -> B -> back to R.
+void NeoPixelScroller::setDirection(ScrollDirection dir) {
+    direction = dir;
+}
+
 uint32_t NeoPixelScroller::Wheel(byte WheelPos) {
     WheelPos = 255 - WheelPos;
     if (WheelPos < 85) {
@@ -38,15 +41,16 @@ void NeoPixelScroller::update() {
         lastUpdate = millis();
 
         strip.clear();
-        
-        // Draw active pixel with dynamic rainbow color
         strip.setPixelColor(currentPixel, Wheel(colorHue));
         strip.show();
 
-        // Advance to next pixel position around the ring
-        currentPixel = (currentPixel + 1) % numPixels;
+        // Step index based on active direction
+        if (direction == CLOCKWISE) {
+            currentPixel = (currentPixel + 1) % numPixels;
+        } else {
+            currentPixel = (currentPixel - 1 + numPixels) % numPixels;
+        }
 
-        // Shift color hue by 15 steps per frame for smooth transitions
         colorHue = (colorHue + 15) % 256;
     }
 }
