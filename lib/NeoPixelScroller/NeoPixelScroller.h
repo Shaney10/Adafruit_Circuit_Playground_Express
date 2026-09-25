@@ -13,7 +13,7 @@ class NeoPixelScroller {
 public:
     NeoPixelScroller(uint16_t numPixels, uint8_t pin);
     void begin();
-    void update();
+    void update(uint16_t touchMask = 0); // Pass a bitmask of touched pixels
     void setSpeed(uint16_t delayMs);
     void setDirection(ScrollDirection dir);
 
